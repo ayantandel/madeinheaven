@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Made in Heaven — Insights</title>
+  <style>
+    :root{
+      --bg:#070712;
+      --text:#e9e9ff;
+      --muted:#a8a8c7;
+      --line:#1f1f3d;
+      --glow: 0 0 18px rgba(255, 92, 231, .35), 0 0 32px rgba(92, 173, 255, .20);
+      --btn: linear-gradient(135deg, #ff5ce7, #5cadff);
+      --shadow: 0 16px 40px rgba(0,0,0,.55);
+      --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: var(--sans);
+      background:
+        radial-gradient(800px 400px at 20% 10%, rgba(255,92,231,.18), transparent 55%),
+        radial-gradient(900px 500px at 80% 30%, rgba(92,173,255,.18), transparent 60%),
+        radial-gradient(700px 500px at 50% 90%, rgba(123,255,181,.10), transparent 60%),
+        var(--bg);
+      color: var(--text);
+      min-height:100vh;
+      padding:24px;
+    }
+    .top{
+      max-width:1100px;
+      margin:0 auto 14px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .title{
+      display:flex; align-items:center; gap:12px;
+    }
+    .badge{
+      width:44px; height:44px;
+      border-radius:14px;
+      display:grid; place-items:center;
+      font-weight:900;
+      background: var(--btn);
+      box-shadow: var(--glow);
+      color:#090915;
+    }
+    h1{ margin:0; font-size:20px; }
+    .sub{ margin-top:4px; color: var(--muted); font-size:13px; line-height:1.4;}
+    .pill{
+      font-family: var(--mono);
+      font-size: 12px;
+      padding:8px 10px;
+      border-radius:999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.25);
+      color: rgba(233,233,255,.86);
+      height: fit-content;
+    }
+
+    .grid{
+      max-width:1100px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:12px;
+    }
+    @media (max-width: 980px){ .grid{ grid-template-columns: repeat(2, 1fr);} }
+    @media (max-width: 520px){ .grid{ grid-template-columns: 1fr; } }
+
+    .card{
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(13,13,28,.72);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:16px;
+    }
+    .k{
+      font-family: var(--mono);
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .v{
+      margin-top:8px;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing:.3px;
+    }
+    .hint{
+      max-width:1100px;
+      margin:12px auto 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height:1.5;
+    }
+    .barWrap{
+      max-width:1100px;
+      margin:12px auto 0;
+      display:grid;
+      gap:12px;
+      grid-template-columns: 1.2fr .8fr;
+    }
+    @media (max-width: 980px){ .barWrap{ grid-template-columns: 1fr; } }
+
+    .barRow{
+      display:grid;
+      grid-template-columns: 120px 1fr 70px;
+      gap:10px;
+      align-items:center;
+      margin-top:10px;
+    }
+    .bar{
+      height: 12px;
+      border-radius:999px;
+      background: rgba(255,255,255,.10);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .fill{
+      height:100%;
+      width:0%;
+      background: var(--btn);
+      box-shadow: var(--glow);
+      transition: width .2s ease;
+    }
+    .smallNum{
+      font-family: var(--mono);
+      color: rgba(233,233,255,.88);
+      text-align:right;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <div class="title">
+      <div class="badge">MIH</div>
+      <div>
+        <h1>Made in Heaven — Operational Insights</h1>
+        <div class="sub">Live metrics calculated from Firestore (updates instantly when staff changes status).</div>
+      </div>
+    </div>
+    <div class="pill">insights.html</div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="k">TOTAL ENQUIRIES</div>
+      <div class="v" id="total">0</div>
+    </div>
+    <div class="card">
+      <div class="k">NEW</div>
+      <div class="v" id="newCount">0</div>
+    </div>
+    <div class="card">
+      <div class="k">IN PROGRESS</div>
+      <div class="v" id="progCount">0</div>
+    </div>
+    <div class="card">
+      <div class="k">RESOLVED</div>
+      <div class="v" id="resCount">0</div>
+    </div>
+  </div>
+
+  <div class="barWrap">
+    <div class="card">
+      <div class="k">STATUS DISTRIBUTION</div>
+
+      <div class="barRow">
+        <div class="k">New</div>
+        <div class="bar"><div class="fill" id="barNew"></div></div>
+        <div class="smallNum" id="pctNew">0%</div>
+      </div>
+
+      <div class="barRow">
+        <div class="k">In Progress</div>
+        <div class="bar"><div class="fill" id="barProg"></div></div>
+        <div class="smallNum" id="pctProg">0%</div>
+      </div>
+
+      <div class="barRow">
+        <div class="k">Resolved</div>
+        <div class="bar"><div class="fill" id="barRes"></div></div>
+        <div class="smallNum" id="pctRes">0%</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="k">RESOLUTION RATE</div>
+      <div class="v" id="resRate">0%</div>
+
+      <div style="margin-top:14px;">
+        <div class="k">ENQUIRIES (LAST 24H)</div>
+        <div class="v" id="last24">0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hint">
+    Proof tip: Submit from <span style="font-family:var(--mono);">public.html</span>, update status in <span style="font-family:var(--mono);">staff.html</span>, and screenshot this page updating with no refresh.
+  </div>
+
+  <!-- Firebase SDKs (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    // ✅ YOUR CONFIG (pasted exactly)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCumJIq2bBEAQP3o5Yq4Zrp87j5lL1rUQE",
+      authDomain: "made-in-heaven-9706f.firebaseapp.com",
+      projectId: "made-in-heaven-9706f",
+      storageBucket: "made-in-heaven-9706f.firebasestorage.app",
+      messagingSenderId: "1059149720568",
+      appId: "1:1059149720568:web:bbaaf0ba1623243a00c40d"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const elTotal = document.getElementById("total");
+    const elNew = document.getElementById("newCount");
+    const elProg = document.getElementById("progCount");
+    const elRes = document.getElementById("resCount");
+    const elRate = document.getElementById("resRate");
+    const el24 = document.getElementById("last24");
+
+    const barNew = document.getElementById("barNew");
+    const barProg = document.getElementById("barProg");
+    const barRes = document.getElementById("barRes");
+
+    const pctNew = document.getElementById("pctNew");
+    const pctProg = document.getElementById("pctProg");
+    const pctRes = document.getElementById("pctRes");
+
+    function pct(part, total){
+      if (!total) return 0;
+      return Math.round((part / total) * 100);
+    }
+
+    function setBar(barEl, pctVal){
+      barEl.style.width = pctVal + "%";
+    }
+
+    function isWithin24h(ts){
+      if (!ts) return false;
+      try{
+        const d = ts.toDate();
+        const now = new Date();
+        const diff = now - d;
+        return diff >= 0 && diff <= (24 * 60 * 60 * 1000);
+      } catch {
+        return false;
+      }
+    }
+
+    // Real-time listener
+    db.collection("enquiries").onSnapshot((snap) => {
+      const docs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      const total = docs.length;
+      const nNew = docs.filter(d => d.status === "New").length;
+      const nProg = docs.filter(d => d.status === "In Progress").length;
+      const nRes = docs.filter(d => d.status === "Resolved").length;
+
+      const resRate = total ? Math.round((nRes / total) * 100) : 0;
+
+      const last24 = docs.filter(d => isWithin24h(d.createdAt)).length;
+
+      elTotal.textContent = total;
+      elNew.textContent = nNew;
+      elProg.textContent = nProg;
+      elRes.textContent = nRes;
+      elRate.textContent = resRate + "%";
+      el24.textContent = last24;
+
+      const pNew = pct(nNew, total);
+      const pProg = pct(nProg, total);
+      const pRes = pct(nRes, total);
+
+      setBar(barNew, pNew);
+      setBar(barProg, pProg);
+      setBar(barRes, pRes);
+
+      pctNew.textContent = pNew + "%";
+      pctProg.textContent = pProg + "%";
+      pctRes.textContent = pRes + "%";
+    }, (err) => {
+      console.error(err);
+      elRate.textContent = "Error";
+    });
+  </script>
+</body>
+</html>

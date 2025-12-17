@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Made in Heaven — Customer Enquiry</title>
+  <style>
+    :root{
+      --bg:#070712;
+      --card:#0d0d1c;
+      --text:#e9e9ff;
+      --muted:#a8a8c7;
+      --line:#1f1f3d;
+      --glow: 0 0 18px rgba(255, 92, 231, .35), 0 0 32px rgba(92, 173, 255, .20);
+      --grad: linear-gradient(135deg, #ff5ce7, #5cadff, #7bffb5);
+      --grad2: linear-gradient(135deg, rgba(255,92,231,.18), rgba(92,173,255,.12));
+      --danger:#ff4d6d;
+      --ok:#52ffb8;
+      --warn:#ffd166;
+      --btn: linear-gradient(135deg, #ff5ce7, #5cadff);
+      --btnHover: linear-gradient(135deg, #ff7aef, #7bc0ff);
+      --shadow: 0 16px 40px rgba(0,0,0,.55);
+      --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: var(--sans);
+      background:
+        radial-gradient(800px 400px at 20% 10%, rgba(255,92,231,.18), transparent 55%),
+        radial-gradient(900px 500px at 80% 30%, rgba(92,173,255,.18), transparent 60%),
+        radial-gradient(700px 500px at 50% 90%, rgba(123,255,181,.10), transparent 60%),
+        var(--bg);
+      color: var(--text);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+
+    .wrap{
+      width: min(980px, 100%);
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:18px;
+    }
+
+    @media (max-width: 880px){
+      .wrap{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      background: var(--grad2);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background: var(--grad);
+      filter: blur(18px);
+      opacity:.18;
+      z-index:0;
+    }
+
+    .inner{
+      position:relative;
+      z-index:1;
+      background: rgba(13,13,28,.76);
+      padding:22px;
+      border-radius: var(--radius);
+      margin:10px;
+      border: 1px solid rgba(255,255,255,.06);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:14px;
+    }
+    .logo{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .badge{
+      width:44px; height:44px;
+      border-radius: 14px;
+      background: var(--btn);
+      box-shadow: var(--glow);
+      display:grid;
+      place-items:center;
+      font-weight:800;
+      letter-spacing:.5px;
+    }
+    h1{
+      margin:0;
+      font-size: 20px;
+      line-height:1.2;
+    }
+    .tag{
+      margin:4px 0 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .pill{
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(233,233,255,.86);
+      padding:8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.25);
+    }
+
+    .desc{
+      margin: 10px 0 16px;
+      color: rgba(233,233,255,.86);
+      font-size: 14px;
+      line-height:1.55;
+    }
+
+    label{
+      display:block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom:6px;
+    }
+
+    input, textarea, select{
+      width:100%;
+      padding:12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.25);
+      color: var(--text);
+      outline:none;
+      transition: .15s ease;
+    }
+
+    input:focus, textarea:focus, select:focus{
+      border-color: rgba(255,92,231,.45);
+      box-shadow: 0 0 0 4px rgba(255,92,231,.10);
+    }
+
+    textarea{ resize: vertical; min-height: 120px; }
+
+    .grid2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 560px){
+      .grid2{ grid-template-columns: 1fr; }
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin-top: 14px;
+    }
+
+    button{
+      border:0;
+      cursor:pointer;
+      padding: 12px 14px;
+      border-radius: 14px;
+      color:#090915;
+      font-weight: 800;
+      background: var(--btn);
+      box-shadow: var(--glow);
+      transition: .15s ease;
+      flex: 1;
+    }
+    button:hover{ background: var(--btnHover); transform: translateY(-1px); }
+
+    .smallbtn{
+      flex:0 0 auto;
+      background: rgba(0,0,0,.25);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow:none;
+      font-weight: 700;
+    }
+    .smallbtn:hover{
+      transform:none;
+      background: rgba(0,0,0,.35);
+    }
+
+    .msg{
+      margin-top: 12px;
+      font-size: 13px;
+      padding:10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
+      display:none;
+    }
+    .msg.ok{ border-color: rgba(82,255,184,.35); }
+    .msg.err{ border-color: rgba(255,77,109,.35); }
+    .msg.warn{ border-color: rgba(255,209,102,.35); }
+
+    .sideTitle{
+      margin:0 0 10px 0;
+      font-size: 16px;
+    }
+    .kv{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      padding:10px 12px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.22);
+      border-radius: 14px;
+      margin-bottom:10px;
+      font-size: 13px;
+      color: rgba(233,233,255,.86);
+    }
+    .kv span{ color: var(--muted); }
+    .hint{
+      color: var(--muted);
+      font-size: 12px;
+      line-height:1.5;
+      margin-top: 10px;
+    }
+    .mono{ font-family: var(--mono); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="inner">
+        <div class="brand">
+          <div class="logo">
+            <div class="badge">MIH</div>
+            <div>
+              <h1>Made in Heaven — Customer Enquiry</h1>
+              <div class="tag">Anime merch store • enquiries go straight to our staff inbox</div>
+            </div>
+          </div>
+          <div class="pill">public.html</div>
+        </div>
+
+        <p class="desc">
+          Need stock info, sizing help, or a special order? Drop your details below and our team will triage it.
+          You’ll see faster replies when we have the right info 👀
+        </p>
+
+        <form id="enquiryForm">
+          <div class="grid2">
+            <div>
+              <label for="name">Your name</label>
+              <input id="name" type="text" placeholder="e.g., Yuta" required />
+            </div>
+            <div>
+              <label for="email">Email</label>
+              <input id="email" type="email" placeholder="e.g., yuta@email.com" required />
+            </div>
+          </div>
+
+          <div style="margin-top:12px;">
+            <label for="topic">Topic</label>
+            <select id="topic" required>
+              <option value="Stock / Availability">Stock / Availability</option>
+              <option value="Sizing / Product Help">Sizing / Product Help</option>
+              <option value="Order Issue">Order Issue</option>
+              <option value="Wholesale / Bulk">Wholesale / Bulk</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div style="margin-top:12px;">
+            <label for="message">Message</label>
+            <textarea id="message" placeholder="Write your enquiry (10+ characters)..." required></textarea>
+          </div>
+
+          <div class="actions">
+            <button type="submit">Submit Enquiry</button>
+            <button type="button" class="smallbtn" id="fillDemo">Fill demo</button>
+          </div>
+        </form>
+
+        <div id="msg" class="msg"></div>
+
+        <div class="hint">
+          Tip: For screenshots, submit an enquiry here, then open <span class="mono">staff.html</span> in another tab and watch it appear with no refresh.
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="inner">
+        <h3 class="sideTitle">What happens next?</h3>
+        <div class="kv"><span>Step 1</span> You submit an enquiry</div>
+        <div class="kv"><span>Step 2</span> Staff sees it instantly (real-time)</div>
+        <div class="kv"><span>Step 3</span> Staff updates status + notes</div>
+        <div class="kv"><span>Step 4</span> Insights updates instantly</div>
+
+        <p class="hint">
+          This uses a live Firestore database collection called <span class="mono">enquiries</span>.
+          Status starts at <span class="mono">New</span> and staff can move it to <span class="mono">In Progress</span> or <span class="mono">Resolved</span>.
+        </p>
+
+        <p class="hint">
+          ⚠️ If you see permission errors later, make sure Firestore is in test mode (for the demo) or adjust security rules.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    // ✅ YOUR CONFIG (pasted exactly)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCumJIq2bBEAQP3o5Yq4Zrp87j5lL1rUQE",
+      authDomain: "made-in-heaven-9706f.firebaseapp.com",
+      projectId: "made-in-heaven-9706f",
+      storageBucket: "made-in-heaven-9706f.firebasestorage.app",
+      messagingSenderId: "1059149720568",
+      appId: "1:1059149720568:web:bbaaf0ba1623243a00c40d"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const form = document.getElementById("enquiryForm");
+    const msg = document.getElementById("msg");
+
+    function showMsg(type, text){
+      msg.className = "msg " + type;
+      msg.textContent = text;
+      msg.style.display = "block";
+    }
+
+    document.getElementById("fillDemo").addEventListener("click", () => {
+      document.getElementById("name").value = "Gojo Satoru";
+      document.getElementById("email").value = "gojo@madeinheaven.store";
+      document.getElementById("topic").value = "Stock / Availability";
+      document.getElementById("message").value = "Do you have the JJK Gojo figure in stock? Also, any discounts for 2 items?";
+      showMsg("warn", "Demo filled. Hit Submit Enquiry.");
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      msg.style.display = "none";
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const topic = document.getElementById("topic").value;
+      const message = document.getElementById("message").value.trim();
+
+      if (!name) return showMsg("err", "Please enter your name.");
+      if (!email.includes("@")) return showMsg("err", "Please enter a valid email.");
+      if (message.length < 10) return showMsg("err", "Message must be at least 10 characters.");
+
+      try {
+        await db.collection("enquiries").add({
+          name,
+          email,
+          topic,
+          message,
+          status: "New",
+          staffNotes: "",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        form.reset();
+        showMsg("ok", "✅ Enquiry submitted! Our staff inbox will update in real time.");
+      } catch (err) {
+        console.error(err);
+        showMsg("err", "❌ Error submitting enquiry. Open DevTools Console to see details.");
+      }
+    });
+  </script>
+</body>
+</html>

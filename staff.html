@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Made in Heaven — Staff Inbox</title>
+  <style>
+    :root{
+      --bg:#070712;
+      --card:#0d0d1c;
+      --text:#e9e9ff;
+      --muted:#a8a8c7;
+      --line:#1f1f3d;
+      --glow: 0 0 18px rgba(255, 92, 231, .35), 0 0 32px rgba(92, 173, 255, .20);
+      --grad: linear-gradient(135deg, #ff5ce7, #5cadff, #7bffb5);
+      --btn: linear-gradient(135deg, #ff5ce7, #5cadff);
+      --btnHover: linear-gradient(135deg, #ff7aef, #7bc0ff);
+      --shadow: 0 16px 40px rgba(0,0,0,.55);
+      --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      --ok:#52ffb8; --warn:#ffd166; --bad:#ff4d6d;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: var(--sans);
+      background:
+        radial-gradient(800px 400px at 20% 10%, rgba(255,92,231,.18), transparent 55%),
+        radial-gradient(900px 500px at 80% 30%, rgba(92,173,255,.18), transparent 60%),
+        radial-gradient(700px 500px at 50% 90%, rgba(123,255,181,.10), transparent 60%),
+        var(--bg);
+      color: var(--text);
+      min-height:100vh;
+      padding:24px;
+    }
+    .top{
+      max-width:1100px;
+      margin:0 auto 14px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .title{
+      display:flex; align-items:center; gap:12px;
+    }
+    .badge{
+      width:44px; height:44px;
+      border-radius:14px;
+      display:grid; place-items:center;
+      font-weight:900;
+      background: var(--btn);
+      box-shadow: var(--glow);
+      color:#090915;
+    }
+    h1{ margin:0; font-size:20px; }
+    .sub{ margin-top:4px; color: var(--muted); font-size:13px; line-height:1.4;}
+    .pill{
+      font-family: var(--mono);
+      font-size: 12px;
+      padding:8px 10px;
+      border-radius:999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.25);
+      color: rgba(233,233,255,.86);
+      height: fit-content;
+    }
+
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+    }
+    .card{
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(13,13,28,.72);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:16px;
+    }
+
+    .loginGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-top: 10px;
+    }
+    @media (max-width: 720px){ .loginGrid{ grid-template-columns: 1fr; } }
+
+    label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
+    input, textarea, select{
+      width:100%;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.25);
+      color: var(--text);
+      outline:none;
+    }
+    input:focus, textarea:focus, select:focus{
+      border-color: rgba(255,92,231,.45);
+      box-shadow: 0 0 0 4px rgba(255,92,231,.10);
+    }
+    textarea{ resize: vertical; min-height: 80px; }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      margin-top: 12px;
+      align-items:center;
+    }
+    button{
+      border:0;
+      cursor:pointer;
+      padding: 12px 14px;
+      border-radius: 14px;
+      color:#090915;
+      font-weight: 900;
+      background: var(--btn);
+      box-shadow: var(--glow);
+      transition:.15s ease;
+    }
+    button:hover{ background: var(--btnHover); transform: translateY(-1px); }
+
+    .mutebtn{
+      background: rgba(0,0,0,.25);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow:none;
+      font-weight: 800;
+    }
+    .mutebtn:hover{ transform:none; background: rgba(0,0,0,.35); }
+
+    .msg{
+      margin-top: 12px;
+      font-size: 13px;
+      padding:10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
+      display:none;
+    }
+    .msg.ok{ border-color: rgba(82,255,184,.35); }
+    .msg.err{ border-color: rgba(255,77,109,.35); }
+    .msg.warn{ border-color: rgba(255,209,102,.35); }
+
+    .toolbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom: 10px;
+    }
+    .stats{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      color: rgba(233,233,255,.86);
+      font-size: 13px;
+    }
+    .stat{
+      padding:8px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.25);
+      font-family: var(--mono);
+    }
+
+    .list{
+      display:grid;
+      gap:12px;
+    }
+
+    .item{
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.22);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      align-items:flex-start;
+    }
+    .who{
+      font-weight:900;
+      letter-spacing:.2px;
+    }
+    .meta{
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+    .chip{
+      font-family: var(--mono);
+      font-size: 12px;
+      padding:6px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.25);
+    }
+    .chip.new{ border-color: rgba(255,209,102,.35); }
+    .chip.prog{ border-color: rgba(92,173,255,.35); }
+    .chip.res{ border-color: rgba(82,255,184,.35); }
+
+    .split{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-top: 10px;
+    }
+    @media (max-width: 900px){ .split{ grid-template-columns: 1fr; } }
+
+    .small{
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 10px;
+      line-height:1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <div class="title">
+      <div class="badge">MIH</div>
+      <div>
+        <h1>Made in Heaven — Staff Enquiry Inbox</h1>
+        <div class="sub">Real-time triage dashboard (Firestore listener). Update status + internal notes.</div>
+      </div>
+    </div>
+    <div class="pill">staff.html</div>
+  </div>
+
+  <div class="wrap">
+    <div class="card" id="loginCard">
+      <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+        <div>
+          <div style="font-weight:900;">Staff Access</div>
+          <div class="small">
+            Marker credentials (as required): <span style="font-family:var(--mono);">admin / staff123</span><br/>
+            (This is a simple gate for the assignment demo.)
+          </div>
+        </div>
+      </div>
+
+      <div class="loginGrid">
+        <div>
+          <label for="user">Username</label>
+          <input id="user" placeholder="admin" />
+        </div>
+        <div>
+          <label for="pass">Password</label>
+          <input id="pass" type="password" placeholder="staff123" />
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="loginBtn">Login</button>
+        <button class="mutebtn" id="demoLogin">Demo-fill</button>
+      </div>
+
+      <div id="loginMsg" class="msg"></div>
+    </div>
+
+    <div class="card" id="appCard" style="display:none;">
+      <div class="toolbar">
+        <div class="stats">
+          <div class="stat" id="statTotal">TOTAL: 0</div>
+          <div class="stat" id="statNew">NEW: 0</div>
+          <div class="stat" id="statProg">IN PROGRESS: 0</div>
+          <div class="stat" id="statRes">RESOLVED: 0</div>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <select id="filterStatus">
+            <option value="ALL">Show: All</option>
+            <option value="New">Show: New</option>
+            <option value="In Progress">Show: In Progress</option>
+            <option value="Resolved">Show: Resolved</option>
+          </select>
+          <button class="mutebtn" id="logoutBtn">Logout</button>
+        </div>
+      </div>
+
+      <div id="appMsg" class="msg"></div>
+
+      <div class="list" id="list"></div>
+
+      <div class="small">
+        Proof tip: Keep <span style="font-family:var(--mono);">public.html</span> open in another tab. Submit an enquiry and watch it appear here without refresh.
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    // ✅ YOUR CONFIG (pasted exactly)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCumJIq2bBEAQP3o5Yq4Zrp87j5lL1rUQE",
+      authDomain: "made-in-heaven-9706f.firebaseapp.com",
+      projectId: "made-in-heaven-9706f",
+      storageBucket: "made-in-heaven-9706f.firebasestorage.app",
+      messagingSenderId: "1059149720568",
+      appId: "1:1059149720568:web:bbaaf0ba1623243a00c40d"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const loginCard = document.getElementById("loginCard");
+    const appCard = document.getElementById("appCard");
+    const loginMsg = document.getElementById("loginMsg");
+    const appMsg = document.getElementById("appMsg");
+
+    const listEl = document.getElementById("list");
+    const filterEl = document.getElementById("filterStatus");
+
+    const statTotal = document.getElementById("statTotal");
+    const statNew = document.getElementById("statNew");
+    const statProg = document.getElementById("statProg");
+    const statRes = document.getElementById("statRes");
+
+    function showMsg(el, type, text){
+      el.className = "msg " + type;
+      el.textContent = text;
+      el.style.display = "block";
+    }
+    function hideMsg(el){ el.style.display = "none"; }
+
+    // Simple gate credentials (assignment demo)
+    const OK_USER = "admin";
+    const OK_PASS = "staff123";
+
+    document.getElementById("demoLogin").addEventListener("click", () => {
+      document.getElementById("user").value = "admin";
+      document.getElementById("pass").value = "staff123";
+      showMsg(loginMsg, "warn", "Demo filled. Click Login.");
+    });
+
+    document.getElementById("loginBtn").addEventListener("click", () => {
+      hideMsg(loginMsg);
+      const u = document.getElementById("user").value.trim();
+      const p = document.getElementById("pass").value.trim();
+      if (u === OK_USER && p === OK_PASS){
+        loginCard.style.display = "none";
+        appCard.style.display = "block";
+        startRealtime();
+      } else {
+        showMsg(loginMsg, "err", "Invalid credentials. Use admin / staff123");
+      }
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      location.reload();
+    });
+
+    let unsubscribe = null;
+    let currentDocs = [];
+
+    filterEl.addEventListener("change", () => {
+      renderList();
+    });
+
+    function chipClass(status){
+      if (status === "New") return "chip new";
+      if (status === "In Progress") return "chip prog";
+      return "chip res";
+    }
+
+    function formatTime(ts){
+      if (!ts) return "—";
+      try{
+        const d = ts.toDate();
+        return d.toLocaleString();
+      } catch {
+        return "—";
+      }
+    }
+
+    async function updateEnquiry(id, patch){
+      hideMsg(appMsg);
+      try{
+        patch.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+        await db.collection("enquiries").doc(id).update(patch);
+        showMsg(appMsg, "ok", "✅ Updated.");
+        setTimeout(() => hideMsg(appMsg), 1200);
+      } catch(err){
+        console.error(err);
+        showMsg(appMsg, "err", "❌ Update failed. Check console.");
+      }
+    }
+
+    function renderStats(){
+      const total = currentDocs.length;
+      const nNew = currentDocs.filter(d => d.status === "New").length;
+      const nProg = currentDocs.filter(d => d.status === "In Progress").length;
+      const nRes = currentDocs.filter(d => d.status === "Resolved").length;
+
+      statTotal.textContent = "TOTAL: " + total;
+      statNew.textContent = "NEW: " + nNew;
+      statProg.textContent = "IN PROGRESS: " + nProg;
+      statRes.textContent = "RESOLVED: " + nRes;
+    }
+
+    function renderList(){
+      const filter = filterEl.value;
+      const docs = (filter === "ALL") ? currentDocs : currentDocs.filter(d => d.status === filter);
+
+      listEl.innerHTML = "";
+
+      if (docs.length === 0){
+        const empty = document.createElement("div");
+        empty.className = "item";
+        empty.innerHTML = `<div style="color:var(--muted); font-size:13px;">No enquiries to show.</div>`;
+        listEl.appendChild(empty);
+        return;
+      }
+
+      for (const d of docs){
+        const item = document.createElement("div");
+        item.className = "item";
+
+        item.innerHTML = `
+          <div class="row">
+            <div>
+              <div class="who">${escapeHtml(d.name || "Unknown")}</div>
+              <div class="meta">${escapeHtml(d.email || "—")} • Topic: ${escapeHtml(d.topic || "—")}</div>
+              <div class="meta">Created: ${formatTime(d.createdAt)} • Updated: ${formatTime(d.updatedAt)}</div>
+            </div>
+            <div class="${chipClass(d.status)}">${escapeHtml(d.status || "New")}</div>
+          </div>
+
+          <div style="margin-top:10px; color:rgba(233,233,255,.88); font-size:14px; line-height:1.5;">
+            ${escapeHtml(d.message || "")}
+          </div>
+
+          <div class="split">
+            <div>
+              <label>Status</label>
+              <select data-id="${d.id}" class="statusSel">
+                <option ${d.status==="New"?"selected":""}>New</option>
+                <option ${d.status==="In Progress"?"selected":""}>In Progress</option>
+                <option ${d.status==="Resolved"?"selected":""}>Resolved</option>
+              </select>
+            </div>
+            <div>
+              <label>Internal Notes</label>
+              <textarea data-id="${d.id}" class="notesBox" placeholder="Add staff notes...">${escapeHtml(d.staffNotes || "")}</textarea>
+            </div>
+          </div>
+
+          <div class="actions" style="margin-top:10px;">
+            <button class="saveBtn" data-id="${d.id}">Save Update</button>
+            <button class="mutebtn copyBtn" data-email="${escapeHtml(d.email||"")}">Copy Email</button>
+          </div>
+        `;
+
+        listEl.appendChild(item);
+      }
+
+      // Wire actions
+      document.querySelectorAll(".saveBtn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-id");
+          const status = document.querySelector(`.statusSel[data-id="${id}"]`).value;
+          const notes = document.querySelector(`.notesBox[data-id="${id}"]`).value.trim();
+          await updateEnquiry(id, { status, staffNotes: notes });
+        });
+      });
+
+      document.querySelectorAll(".copyBtn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const email = btn.getAttribute("data-email") || "";
+          try{
+            await navigator.clipboard.writeText(email);
+            showMsg(appMsg, "ok", "✅ Email copied.");
+            setTimeout(() => hideMsg(appMsg), 1200);
+          } catch {
+            showMsg(appMsg, "warn", "Couldn’t copy automatically. Email: " + email);
+          }
+        });
+      });
+    }
+
+    function startRealtime(){
+      // Real-time listener for proof requirement
+      unsubscribe = db.collection("enquiries")
+        .orderBy("createdAt", "desc")
+        .onSnapshot((snap) => {
+          currentDocs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          renderStats();
+          renderList();
+        }, (err) => {
+          console.error(err);
+          showMsg(appMsg, "err", "❌ Realtime listener error. Check console / Firestore rules.");
+        });
+    }
+
+    function escapeHtml(str){
+      return String(str ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+  </script>
+</body>
+</html>
