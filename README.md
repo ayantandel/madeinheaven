@@ -1,2 +1,17 @@
 # madeinheaven
 cloud mini SaaS
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Made in Heaven — Enquiry System</title>
+</head>
+<body>
+  <h2>Made in Heaven — Enquiry System</h2>
+  <ul>
+    <li><a href="public.html">Public Enquiry Page</a></li>
+    <li><a href="staff.html">Staff Dashboard</a></li>
+    <li><a href="insights.html">Insights</a></li>
+  </ul>
+</body>
+</html>
